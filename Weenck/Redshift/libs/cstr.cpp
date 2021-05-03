@@ -1,9 +1,21 @@
-#include <cmath>
+#pragma once
 #include "typedefs.h"
 #include "terminal.cpp"
 
-char intTo_StringOutput[128];
-char * itoa(int value, int base = 10)
+int strlen(char *p)
+{
+    unsigned int i = 0;
+    char *start = p;
+
+    while(*p!='\0')
+    {
+        i++;
+        p++;
+    }
+    return p - start;
+}
+
+char* itoa(int value, int base = 10)
 {
     char* str = "";
 
@@ -100,4 +112,139 @@ bool isNumeric(char* str)
             return false;
     }
     return true;
+}
+
+bool contains(char* str, char* sqn)
+{
+    int strIndex; int sqnIndex;
+    for (int i = 0; str[i] != 0; i++)
+    {
+        strIndex = i;
+        if (str[strIndex] == sqn[sqnIndex])
+        {
+            for (; (str[strIndex] != 0 && sqn[sqnIndex] != 0); )
+            {
+                if (str[strIndex] != sqn[sqnIndex])
+                {
+                    sqnIndex = 0;
+                }                    
+
+                if (sqn[sqnIndex + 1] == 0)
+                    return true;
+
+                strIndex++; sqnIndex++;
+            }            
+        }
+    }    
+    return false;
+}
+
+bool startsWith(char* str, char* sqn)
+{
+    for (int i = 0; (str[i] != 0 && sqn[i] != 0); i++)
+    {
+        if (str[i] != sqn[i])
+            return false;      
+    }    
+    return true;
+}
+
+bool endsWith(char* str, char* sqn)
+{
+    int strLen = strlen(str);
+    int sqnLen = strlen(sqn);
+
+    int sIndex = 0;
+    for (int i = strLen - sqnLen; i < strLen; i++)
+    {
+        if (str[i] != sqn[sIndex])
+            return false;        
+        sIndex++;
+    }  
+    return true;
+}
+
+int indexOf(char* str, char* sqn)
+{
+    int strIndex; int sqnIndex;
+    for (int i = 0; str[i] != 0; i++)
+    {
+        strIndex = i;
+        if (str[strIndex] == sqn[sqnIndex])
+        {
+            for (; (str[strIndex] != 0 && sqn[sqnIndex] != 0); )
+            {
+                if (str[strIndex] != sqn[sqnIndex])
+                {
+                    sqnIndex = 0;
+                }                    
+
+                if (sqn[sqnIndex + 1] == 0)
+                    return i;
+
+                strIndex++; sqnIndex++;
+            }            
+        }
+    }    
+    return -1;
+}
+
+int lastIndexOf(char* str, char* sqn)
+{
+    int ret = -1;
+    int strIndex; int sqnIndex;
+    for (int i = 0; str[i] != 0; i++)
+    {
+        strIndex = i;
+        if (str[strIndex] == sqn[sqnIndex])
+        {
+            for (; (str[strIndex] != 0 && sqn[sqnIndex] != 0); )
+            {
+                if (str[strIndex] != sqn[sqnIndex])
+                {
+                    sqnIndex = 0;
+                }                    
+
+                if (sqn[sqnIndex + 1] == 0)
+                    ret = i;
+
+                strIndex++; sqnIndex++;
+            }            
+        }
+        strIndex = 0; sqnIndex = 0;
+    }    
+    return ret;
+}
+
+char* trim(char* str, char c)
+{
+    int startPos = 0; int endPos = strlen(str);
+    for (int i = 0; i < strlen(str); i++)
+    {
+        if (str[i] != c)
+        {
+            startPos = i;
+            break;
+        }           
+    }
+    
+    for (int i = strlen(str) - 1; i > -1; i--)
+    {
+        if (str[i] != c)
+        {
+            endPos = i;
+            break;
+        }         
+    }
+    
+    char* ret;
+    int i = 0;
+    for (; startPos <= endPos; i++)
+    {
+        ret[i] = str[startPos];
+        startPos++;
+    }
+    ret[i] = 0;
+    
+    return ret;
 }
