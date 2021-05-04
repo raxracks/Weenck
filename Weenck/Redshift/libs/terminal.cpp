@@ -1,6 +1,9 @@
 #pragma once
 #include "IO.cpp"
 #include "typedefs.h"
+#include "cstr.cpp"
+
+#include <stdarg.h>
 
 unsigned short* VGA_MEMORY =(unsigned short*)0xb8000;
 
@@ -33,7 +36,7 @@ const int VGA_HEIGHT = 25;
 
 unsigned short cursorPosition;
 
-void SetCursorPosition(uint_16 x, uint_16 y)
+void setCursorPosition(uint_16 x, uint_16 y)
 {
 
 	uint_16 position = x + y * VGA_WIDTH;
@@ -47,7 +50,7 @@ void SetCursorPosition(uint_16 x, uint_16 y)
 	cursor_y = y; 
 }
 
-void UpdateCursorPosition()
+void updateCursorPosition()
 {
 	uint_16 position = cursor_x + cursor_y * VGA_WIDTH;
 
@@ -57,18 +60,18 @@ void UpdateCursorPosition()
 	outb(0x3D5, (unsigned char)((position >> 8) & 0xFF));
 }
 
-void ResetColor()
+void resetColor()
 {
 	foreground = VGA_COLOR_WHITE;
 	background = VGA_COLOR_BLACK;
 }
 
-void PutChar_At(char c, int col, int row, vga_color fg, vga_color bg)
+void putChar_At(char c, int col, int row, vga_color fg, vga_color bg)
 {
 	VGA_MEMORY[col + row * VGA_WIDTH] = (uint_16) c | (uint_16) (fg | bg << 4) << 8;
 }
 
-void PrintString(char* str)
+void putstr(char* str)
 {    
 	for(int i = 0; str[i]!='\0'; ++i)
 	{
@@ -79,7 +82,7 @@ void PrintString(char* str)
 			continue;
 		}
 
-		PutChar_At(str[i], cursor_x, cursor_y, foreground, background);
+		putChar_At(str[i], cursor_x, cursor_y, foreground, background);
 		cursor_x++;
 		if (!(cursor_x < 80))
 		{
@@ -87,32 +90,10 @@ void PrintString(char* str)
 			cursor_y++;
 		}
 	}	
-	UpdateCursorPosition();
+	updateCursorPosition();
 }	
 
-void PrintString_At(char* str, int col, int row)
-{    
-	for(int i = 0; str[i]!='\0'; ++i)
-	{
-		if (str[i] == '\n')
-		{
-			cursor_x = 0;
-			cursor_y++;
-			continue;
-		}
-
-		PutChar_At(str[i], col, row, foreground, background);
-		col++;
-		if (!(col < 80))
-		{
-			col = 0;
-			row++;
-		}
-	}		
-	UpdateCursorPosition();
-}
-
-void Clear(vga_color bg)
+void clear(vga_color bg)
 {
 	for(int y = 0; y < VGA_HEIGHT; y++)
 	{
@@ -122,5 +103,38 @@ void Clear(vga_color bg)
 		}
 	}	
 }
-void Clear() { Clear(background);}
+void clear() { clear(background);}
+
+void printf(char *c, ...)
+{
+    char *s;
+    va_list lst;
+    va_start(lst, c);
+    while(*c != '\0')
+    {
+        if(*c != '%')
+        {
+            putChar_At(*c, cursor_x, cursor_y, foreground, background); cursor_x++; 
+            c++;
+            continue;
+        }
+
+		c++;
+
+        if(*c == '\0')
+        {
+            break;
+        }
+
+		switch(*c)
+        {
+            case 's': putstr(va_arg(lst, char *)); break;
+            case 'd': putstr(itoa(va_arg(lst, int))); break;
+			case 'i': putstr(itoa(va_arg(lst, int))); break;
+			case 'x': putstr(itoa(va_arg(lst, int), 16)); break;
+        }
+        c++;
+    }
+	updateCursorPosition();
+}
 
