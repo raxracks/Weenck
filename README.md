@@ -12,4 +12,4 @@ Redshift goes further away from hardware by abstracting everything. It should co
 Kernel should be implemented as a higher half microkernel or macrokernel with modules.
 
 # Entry = The Entry Point
-This is where the user writes code. It should mostly behave like a shell with Ring 0 Access. User mode will be impemented on it.
+This is where the user writes code. It should mostly behave like a shell with Ring 0 Access. User mode will be implemented on it.
